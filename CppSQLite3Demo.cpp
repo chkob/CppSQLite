@@ -1,10 +1,10 @@
-#include "CppSQLite.h"
+#include "CppSQLite3.h"
 #include <ctime>
 #include <iostream>
 
 using namespace std;
 
-const char* gszFile = "C:\\test.db";
+const char* gszFile = "test.db";
 
 int main(int argc, char** argv)
 {
@@ -12,7 +12,7 @@ int main(int argc, char** argv)
     {
         int i, fld;
         time_t tmStart, tmEnd;
-        CppSQLiteDB db;
+        CppSQLite3DB db;
 
         cout << "SQLite Version: " << db.SQLiteVersion() << endl;
 
@@ -29,7 +29,7 @@ int main(int argc, char** argv)
         cout << nRows << " rows inserted" << endl;
 
         nRows = db.execDML(
-         "update emp set empname = 'Christiano Ronaldo' where empno = 7;");
+                "update emp set empname = 'Christiano Ronaldo' where empno = 7;");
         cout << nRows << " rows updated" << endl;
 
         nRows = db.execDML("delete from emp where empno = 7;");
@@ -56,10 +56,10 @@ int main(int argc, char** argv)
         tmEnd = time(0);
 
         ////////////////////////////////////////////////////////////////
-        // Demonstrate CppSQLiteDB::execScalar()
+        // Demonstrate CppSQLite3DB::execScalar()
         ////////////////////////////////////////////////////////////////
         cout << db.execScalar("select count(*) from emp;") 
-               << " rows in emp table in ";
+            << " rows in emp table in ";
         cout << tmEnd-tmStart << " seconds (that was fast!)" << endl;
 
         ////////////////////////////////////////////////////////////////
@@ -68,27 +68,28 @@ int main(int argc, char** argv)
         cout << endl << "Auto increment test" << endl;
         db.execDML("drop table emp;");
         db.execDML(
-         "create table emp(empno integer primary key, empname char(20));");
+                "create table emp(empno integer primary key, empname char(20));");
         cout << nRows << " rows deleted" << endl;
 
         for (i = 0; i < 5; i++)
         {
             char buf[128];
             sprintf(buf, 
-       "insert into emp (empname) values ('Empname%06d');", i+1);
+                    "insert into emp (empname) values ('Empname%06d');", i+1);
             db.execDML(buf);
             cout << " primary key: " << db.lastRowId() << endl;
         }
 
-     ///////////////////////////////////////////////////////////////////
-     // Query data and also show results of inserts into auto-increment field
-     //////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////
+        // Query data and also show results of inserts into auto-increment field
+        //////////////////////////////////////////////////////////////////
         cout << endl << "Select statement test" << endl;
-        CppSQLiteQuery q = db.execQuery("select * from emp order by 1;");
+        CppSQLite3Query q = db.execQuery("select * from emp order by 1;");
 
         for (fld = 0; fld < q.numFields(); fld++)
         {
-            cout << q.fieldName(fld) << "(" << q.fieldType(fld) << ")|";
+            //cout << q.fieldName(fld) << "(" << q.fieldType(ld) << ")|";
+            cout << q.fieldName(fld) << "(" << q.fieldDataType(fld) << ")|";
         }
         cout << endl;
 
@@ -103,7 +104,7 @@ int main(int argc, char** argv)
         // SQLite's printf() functionality. Handles embedded quotes and NULLs
         ////////////////////////////////////////////////////////////////
         cout << endl << "SQLite sprintf test" << endl;
-        CppSQLiteBuffer bufSQL;
+        CppSQLite3Buffer bufSQL;
         bufSQL.format("insert into emp (empname) values (%Q);", "He's bad");
         cout << (const char*)bufSQL << endl;
         db.execDML(bufSQL);
@@ -114,10 +115,10 @@ int main(int argc, char** argv)
 
         ////////////////////////////////////////////////////////////////////
         // Fetch table at once, and also show how to 
-        // use CppSQLiteTable::setRow() method
+        // use CppSQLite3Table::setRow() method
         //////////////////////////////////////////////////////////////////
         cout << endl << "getTable() test" << endl;
-        CppSQLiteTable t = db.getTable("select * from emp order by 1;");
+        CppSQLite3Table t = db.getTable("select * from emp order by 1;");
 
         for (fld = 0; fld < t.numFields(); fld++)
         {
@@ -138,14 +139,14 @@ int main(int argc, char** argv)
         }
 
         ////////////////////////////////////////////////////////////////////
-        // Test CppSQLiteBinary by storing/retrieving some binary data, checking
+        // Test CppSQLite3Binary by storing/retrieving some binary data, checking
         // it afterwards to make sure it is the same
         //////////////////////////////////////////////////////////////////
         cout << endl << "Binary data test" << endl;
         db.execDML("create table bindata(desc char(10), data blob);");
-        
+
         unsigned char bin[256];
-        CppSQLiteBinary blob;
+        CppSQLite3Binary blob;
 
         for (i = 0; i < sizeof bin; i++)
         {
@@ -155,7 +156,7 @@ int main(int argc, char** argv)
         blob.setBinary(bin, sizeof bin);
 
         bufSQL.format("insert into bindata values ('testing', %Q);", 
-                      blob.getEncoded());
+                blob.getEncoded());
         db.execDML(bufSQL);
         cout << "Stored binary Length: " << sizeof bin << endl;
 
@@ -165,7 +166,7 @@ int main(int argc, char** argv)
         {
             blob.setEncoded((unsigned char*)q.fieldValue("data"));
             cout << "Retrieved binary Length: " 
-       << blob.getBinaryLength() << endl;
+                << blob.getBinaryLength() << endl;
         }
 
         const unsigned char* pbin = blob.getBinary();
@@ -174,7 +175,7 @@ int main(int argc, char** argv)
             if (pbin[i] != i)
             {
                 cout << "Problem: i: ," << i << " bin[i]: " 
-             << pbin[i] << endl;
+                    << pbin[i] << endl;
             }
         }
 
@@ -188,8 +189,8 @@ int main(int argc, char** argv)
         tmStart = time(0);
         db.execDML("begin transaction;");
 
-        CppSQLiteStatement stmt = db.compileStatement(
-            "insert into emp values (?, ?);");
+        CppSQLite3Statement stmt = db.compileStatement(
+                "insert into emp values (?, ?);");
         for (i = 0; i < nRowsToCreate; i++)
         {
             char buf[16];
@@ -204,11 +205,11 @@ int main(int argc, char** argv)
         tmEnd = time(0);
 
         cout << db.execScalar("select count(*) from emp;") 
-           << " rows in emp table in ";
+            << " rows in emp table in ";
         cout << tmEnd-tmStart << " seconds (that was even faster!)" << endl;
         cout << endl << "End of tests" << endl;
     }
-    catch (CppSQLiteException& e)
+    catch (CppSQLite3Exception& e)
     {
         cerr << e.errorCode() << ":" << e.errorMessage() << endl;
     }
