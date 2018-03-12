@@ -1,6 +1,6 @@
 #if defined(_WIN32)
 
-#  if (defined(_USRDLL) || defined(_WINDLL) || defined(BUILD_SHARED_LIB)) && !defined(TIDY_EXPORT) && !defined(TIDY_STATIC)
+#  if (defined(_USRDLL) || defined(_WINDLL) || defined(BUILD_SHARED_LIB)) && !defined(CPPSQLITELIB_EXPORT) && !defined(CPPSQLITELIB_STATIC)
 #    ifdef CPPSQLITELIB_EXPORTS
 #      define CPPSQLITELIB_EXPORT __declspec( dllexport )
 #    else
