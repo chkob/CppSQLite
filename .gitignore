@@ -1,2 +1,6 @@
 /build
 *.o
+/msvc/.vs
+/msvc/x64
+/msvc/CppSQLiteLib/x64
+/msvc/CppSQLiteLib/Debug

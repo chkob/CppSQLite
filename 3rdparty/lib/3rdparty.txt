@@ -1,0 +1,4 @@
+this file will contain a list of 3rd party library in the form of import libary of dll for both of debug\release for the list of dependencies in as follows
+
+ - SQLite3 
+

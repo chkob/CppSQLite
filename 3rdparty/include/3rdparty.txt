@@ -1,0 +1,5 @@
+this file will contain a list of 3rd party library
+
+here is a list of dependencies
+
+ - SQLite3 
